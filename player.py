@@ -11,7 +11,24 @@ class Player(CircleShape):
         self.shoot_timer = 0
 
     def draw(self, screen):
-        pygame.draw.polygon(screen, "white", self.triangle(), 2)
+        if pygame.key.get_pressed()[pygame.K_w]:
+            self.draw_thruster(screen)
+        pygame.draw.polygon(screen, (180, 180, 180), self.triangle())
+
+    def draw_thruster(self, screen):
+        forward = pygame.Vector2(0, 1).rotate(self.rotation)
+        right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 2
+        rear = self.position - forward * self.radius * 1.2
+        flame_tip = rear - forward * 10
+        glow_color = (0, 255, 100)
+        pygame.draw.polygon(screen, glow_color, [
+            rear - right * 1.2,
+            flame_tip - right * 0.3,
+            flame_tip + right * 0.3,
+            rear + right * 1.2
+        ])
+        flame_color = (0, 255, 255)
+        pygame.draw.polygon(screen, flame_color, [rear - right, flame_tip, rear + right])
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -24,7 +41,6 @@ class Player(CircleShape):
     def update(self, dt):
         self.shoot_timer -= dt
         keys = pygame.key.get_pressed()
-
         if keys[pygame.K_w]:
             self.move(dt)
         if keys[pygame.K_s]:
